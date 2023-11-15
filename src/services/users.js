@@ -1,0 +1,42 @@
+import User from "../models/users.js";
+
+export const userService = {
+  getAll: (options) => {
+    try {
+      return User.find({ ...options });
+    } catch (error) {
+      return error;
+    }
+  },
+  getOne: (credentials) => {
+    try {
+      return User.findOne({ ...credentials }).populate("profile");
+    } catch (error) {
+      return error;
+    }
+  },
+  store: async (newUser) => {
+    try {
+      const anUser = new User();
+      anUser.firstName = newUser.firstName;
+      anUser.lastName = newUser.lastName;
+      anUser.username = newUser.username;
+      anUser.password = newUser.password;
+      anUser.email = newUser.email;
+      anUser.profile = newUser.profile;
+
+      return await anUser.save();
+    } catch (error) {
+      return error;
+    }
+  },
+  update: async (id, newUserData) => {
+    try {
+      const data = await User.updateOne({ _id: id }, newUserData);
+
+      return data.modifiedCount;
+    } catch (error) {
+      console.log(error);
+    }
+  },
+};
