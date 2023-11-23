@@ -65,7 +65,7 @@ const usersController = {
         profile: user.profile._id,
       },
       process.env.TOKEN_SECRET,
-      { expiresIn: "24h" }
+      { expiresIn: "1h" }
     );
 
     const aUser = {
