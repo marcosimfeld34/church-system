@@ -87,7 +87,7 @@ const productsController = {
       !req.body.costPrice ||
       !req.body.salePrice ||
       !req.body.salePorcentage ||
-      !req.body.stock ||
+      req.body.stock === undefined ||
       !req.body.category
     ) {
       return res.status(400).json({
