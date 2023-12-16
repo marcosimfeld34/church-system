@@ -38,16 +38,16 @@ const usersController = {
     });
   },
   login: async (req, res) => {
-    const user = await userService.getOne({ email: req.body.email });
+    const foundUser = await userService.getOne({ email: req.body.email });
 
-    if (user === undefined || user === null) {
+    if (foundUser === undefined || foundUser === null) {
       return res.status(404).json({
         status: 404,
         message: NOT_FOUND,
       });
     }
 
-    const isValidPassword = await user.isValidPassword(req.body.password);
+    const isValidPassword = await foundUser.isValidPassword(req.body.password);
 
     if (!isValidPassword) {
       return res.status(404).json({
@@ -58,24 +58,31 @@ const usersController = {
 
     // dos partes: payload y el secret token
     // aca generamos el token
-    const token = jwt.sign(
+    const accessToken = jwt.sign(
       {
-        name: user.firstName + " " + user.lastName,
-        id: user._id,
-        profile: user.profile._id,
+        firstName: foundUser.firstName,
+        lastName: foundUser.lastName,
+        email: foundUser.email,
+        id: foundUser.id,
       },
-      process.env.TOKEN_SECRET,
-      { expiresIn: "1h" }
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "15m" }
     );
 
-    const aUser = {
-      id: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      username: user.username,
-      profile: user.profile.name,
-      // accessToken: token,
-    };
+    const refreshToken = jwt.sign(
+      {
+        firstName: foundUser.firstName,
+        lastName: foundUser.lastName,
+        email: foundUser.email,
+        id: foundUser.id,
+      },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    // saving refreshToken with current user
+    const currentUser = { ...foundUser._doc, refreshToken };
+    await userService.update(currentUser._id, currentUser);
 
     // transporter
     //   .sendMail({
@@ -86,22 +93,90 @@ const usersController = {
     //   })
     //   .then((res) => console.log(res));
 
-    res.cookie("jwt", token, {
+    res.cookie("jwt", refreshToken, {
       httpOnly: true,
+      // maxAge: 24 * 60 * 60 * 1000,
       secure: true,
       sameSite: "none",
     });
 
-    return res.status(200).json({
-      status: 200,
-      user: aUser,
+    return res.json({ accessToken });
+  },
+  refreshToken: async (req, res) => {
+    const cookies = req.cookies;
+
+    if (!cookies?.jwt) return res.sendStatus(401);
+
+    const refreshToken = cookies.jwt;
+
+    const foundUser = await userService.getOne({ refreshToken });
+
+    if (foundUser === undefined || foundUser === null) {
+      return res.status(404).json({
+        status: 404,
+        message: NOT_FOUND,
+      });
+    }
+
+    jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET,
+      (err, decoded) => {
+        if (err || foundUser.email !== decoded.email) {
+          return res.sendStatus(403);
+        }
+        const accessToken = jwt.sign(
+          {
+            firstName: decoded.firstName,
+            lastName: decoded.lastName,
+            email: decoded.email,
+            id: decoded.id,
+          },
+          process.env.ACCESS_TOKEN_SECRET,
+          { expiresIn: "10s" }
+        );
+        return res.json({ accessToken });
+      }
+    );
+  },
+  logout: async (req, res) => {
+    // on client, also delete the accessToken
+
+    const cookies = req.cookies;
+    if (!cookies?.jwt) return res.sendStatus(204); // No content
+
+    const refreshToken = cookies.jwt;
+
+    // Is refreshToken in db?
+    const foundUser = await userService.getOne({ refreshToken });
+
+    if (foundUser === undefined || foundUser === null) {
+      res.clearCookie("jwt", {
+        httpOnly: true,
+        // maxAge: 24 * 60 * 60 * 1000,
+        secure: true,
+        sameSite: "none",
+      });
+      return res.sendStatus(204);
+    }
+
+    // Delete refreshToken in db
+    const currentUser = { ...foundUser._doc, refreshToken: "" };
+    await userService.update(currentUser._id, currentUser);
+
+    res.clearCookie("jwt", {
+      httpOnly: true,
+      // maxAge: 24 * 60 * 60 * 1000,
+      secure: true,
+      sameSite: "none",
     });
+
+    res.sendStatus(204);
   },
   store: async (req, res) => {
     if (
       !req.body.firstName ||
       !req.body.lastName ||
-      !req.body.username ||
       !req.body.password ||
       !req.body.email
     ) {
@@ -123,20 +198,12 @@ const usersController = {
     const alreadyExist = await userService.getOne({ email: req.body.email });
 
     if (alreadyExist) {
-      return res.status(400).json({
-        status: 400,
-        isStored: false,
-        message: DUPLICATE_RECORD,
-      });
+      return res.sendStatus(409);
     }
 
     const storedUser = await userService.store({ ...req.body });
 
-    return res.status(201).json({
-      status: 201,
-      isStored: true,
-      data: storedUser,
-    });
+    return res.sendStatus(201);
   },
   update: async (req, res) => {
     if (

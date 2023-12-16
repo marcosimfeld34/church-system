@@ -4,8 +4,8 @@ export const debtService = {
   getAll: (options) => {
     try {
       return Debt.find({ ...options })
-        .populate("client")
-        .populate("sale")
+        .populate("client", "name")
+        .populate("sale", ["isPaid", "client", "total"])
         .sort({ createdAt: -1 });
     } catch (error) {
       return error;

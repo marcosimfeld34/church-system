@@ -7,7 +7,7 @@ const debtsController = {
 
     const debts = await debtService.getAll({
       $expr: {
-        $and: [{ $eq: ["$isDeleted", false] }],
+        $and: [{ $eq: ["$isDeleted", false] }, { $eq: ["$isPaid", false] }],
       },
     });
 

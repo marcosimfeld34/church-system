@@ -9,6 +9,12 @@ const salesRouter = Router();
 // GET - http://localhost:3000/api/v1/sales/
 salesRouter.get("/", verifyToken, salesController.getAll);
 
+salesRouter.get(
+  "/lastTwelveMonths",
+  verifyToken,
+  salesController.getLastTwelveMonths
+);
+
 // GET - http://localhost:3000/api/v1/sales/:id
 salesRouter.get("/:id", verifyToken, salesController.getOne);
 

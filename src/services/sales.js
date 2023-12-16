@@ -4,9 +4,26 @@ export const salesService = {
   getAll: (options) => {
     try {
       return Sale.find({ ...options })
-        .populate("createdBy")
-        .populate("client")
+        .populate("createdBy", ["firstName", "lastName"])
+        .populate("client", "name")
         .sort({ createdAt: -1 });
+    } catch (error) {
+      return error;
+    }
+  },
+  getTotalByDate: (options) => {
+    try {
+      return Sale.aggregate([
+        {
+          $match: options,
+        },
+        {
+          $group: {
+            _id: null,
+            totalSum: { $sum: "$total" },
+          },
+        },
+      ]);
     } catch (error) {
       return error;
     }

@@ -3,13 +3,47 @@ import { MISSING_FIELDS_REQUIRED, NOT_FOUND } from "../labels/labels.js";
 
 const saleDetailsController = {
   getAll: async (req, res) => {
-    const createdBy = req.user.id;
+    // const createdBy = req.user.id;
 
-    const saleDetails = await saleDetailsService.getAll({
+    let today = new Date();
+
+    let filters = {
       $expr: {
-        $and: [{ $eq: ["$isDeleted", false] }],
+        $and: [
+          { $eq: ["$isDeleted", false] },
+          { $eq: [{ $dayOfMonth: "$createdAt" }, today.getDate()] },
+          { $eq: [{ $month: "$createdAt" }, today.getMonth() + 1] },
+          { $eq: [{ $year: "$createdAt" }, today.getFullYear()] },
+        ],
       },
+    };
+
+    const saleDetails = await saleDetailsService.getAll(filters);
+
+    return res.status(200).json({
+      status: 200,
+      total: saleDetails.length,
+      data: saleDetails,
     });
+  },
+  getTotalSale: async (req, res) => {
+    let today = new Date();
+
+    const options = {
+      $expr: {
+        $and: [
+          { $eq: ["$isDeleted", false] },
+          { $eq: [{ $dayOfMonth: "$createdAt" }, today.getDate()] },
+          { $eq: [{ $month: "$createdAt" }, today.getMonth() + 1] },
+          { $eq: [{ $year: "$createdAt" }, today.getFullYear()] },
+        ],
+      },
+    };
+
+    const saleDetails = await saleDetailsService.getTotalByDate(options);
+    const totalCostSold = saleDetails
+      ?.map((saleDetail) => saleDetail.product.costPrice * saleDetail.quantity)
+      ?.reduce((acc, currentValue) => acc + currentValue, 0);
 
     return res.status(200).json({
       status: 200,
@@ -75,9 +109,9 @@ const saleDetailsController = {
 
     const data = await saleDetailsService.storeMany(saleDetailToStore);
 
-    return res.status(200).json({
-      status: 200,
-      isUpdated: true,
+    return res.status(201).json({
+      status: 201,
+      isStored: true,
       data,
     });
   },
@@ -113,7 +147,7 @@ const saleDetailsController = {
 
     return res.status(200).json({
       status: 200,
-      isUpdated: true,
+      isDeleted: true,
       data,
     });
   },

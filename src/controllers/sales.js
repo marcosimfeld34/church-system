@@ -3,11 +3,62 @@ import { MISSING_FIELDS_REQUIRED, NOT_FOUND } from "../labels/labels.js";
 
 const salesController = {
   getAll: async (req, res) => {
-    const createdBy = req.user.id;
+    // const createdBy = req.user.id;
+
+    let today = new Date();
+
+    const filters = {
+      $expr: {
+        $and: [
+          { $eq: ["$isDeleted", false] },
+          { $eq: [{ $dayOfMonth: "$createdAt" }, today.getDate()] },
+          { $eq: [{ $month: "$createdAt" }, today.getMonth() + 1] },
+          { $eq: [{ $year: "$createdAt" }, today.getFullYear()] },
+        ],
+      },
+    };
+
+    const sales = await salesService.getAll(filters);
+
+    return res.status(200).json({
+      status: 200,
+      total: sales.length,
+      data: sales,
+    });
+  },
+  getTotalSale: async (req, res) => {
+    // const createdBy = req.user.id;
+
+    let today = new Date();
+
+    const filters = {
+      $expr: {
+        $and: [
+          { $eq: ["$isDeleted", false] },
+          { $eq: [{ $dayOfMonth: "$createdAt" }, today.getDate()] },
+          { $eq: [{ $month: "$createdAt" }, today.getMonth() + 1] },
+          { $eq: [{ $year: "$createdAt" }, today.getFullYear()] },
+        ],
+      },
+    };
+
+    const sales = await salesService.getTotalByDate(filters);
+
+    return res.status(200).json({
+      status: 200,
+      data: sales,
+    });
+  },
+  getLastTwelveMonths: async (req, res) => {
+    let twelveMonths = new Date();
+    twelveMonths.setMonth(twelveMonths.getMonth() - 12);
 
     const sales = await salesService.getAll({
       $expr: {
-        $and: [{ $eq: ["$isDeleted", false] }],
+        $and: [
+          { $gte: [{ $year: "$createdAt" }, twelveMonths.getFullYear()] },
+          { $eq: ["$isDeleted", false] },
+        ],
       },
     });
 

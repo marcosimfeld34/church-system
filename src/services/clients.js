@@ -3,7 +3,7 @@ import Client from "../models/clients.js";
 export const clientService = {
   getAll: (options) => {
     try {
-      return Client.find({ ...options }).sort({ createdAt: -1 });
+      return Client.find({ ...options }, ["name"]).sort({ createdAt: -1 });
     } catch (error) {
       return error;
     }

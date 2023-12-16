@@ -3,7 +3,7 @@ import Category from "../models/categories.js";
 export const categoriesService = {
   getAll: (options) => {
     try {
-      return Category.find({ ...options }).sort({ createdAt: -1 });
+      return Category.find({ ...options }, ["name"]).sort({ createdAt: -1 });
     } catch (error) {
       return error;
     }

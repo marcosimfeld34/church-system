@@ -3,7 +3,7 @@ import { MISSING_FIELDS_REQUIRED, NOT_FOUND } from "../labels/labels.js";
 
 const categoriesController = {
   getAll: async (req, res) => {
-    const createdBy = req.user.id;
+    // const createdBy = req.user.id;
 
     const categories = await categoriesService.getAll({
       $expr: {

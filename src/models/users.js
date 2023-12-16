@@ -15,12 +15,6 @@ const userSchema = new Schema({
     min: 2,
     max: 255,
   },
-  username: {
-    type: String,
-    required: true,
-    min: 3,
-    max: 255,
-  },
   password: {
     type: String,
     required: true,
@@ -32,20 +26,10 @@ const userSchema = new Schema({
     min: 6,
     max: 1024,
   },
-  token: {
-    type: String,
-  },
-  resetToken: {
-    type: String,
-  },
+  refreshToken: { type: String, default: "" },
   isDeleted: {
     type: Boolean,
     default: false,
-  },
-  profile: {
-    type: SchemaTypes.ObjectId,
-    ref: "profile",
-    required: false,
   },
   createdAt: {
     type: Date,

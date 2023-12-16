@@ -3,7 +3,9 @@ import jwt from "jsonwebtoken";
 import { ACCESS_DENIED, INVALID_TOKEN } from "../labels/labels.js";
 
 const verifyToken = (req, res, next) => {
-  const token = req.cookies.jwt;
+  const authHeader = req.headers["authorization"];
+  if (!authHeader) return res.sendStatus(401);
+  const token = authHeader.split(" ")[1];
 
   if (!token) {
     return res.status(401).json({
@@ -13,14 +15,11 @@ const verifyToken = (req, res, next) => {
   }
 
   try {
-    const verified = jwt.verify(token, process.env.TOKEN_SECRET);
+    const verified = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     req.user = verified;
     next();
   } catch (error) {
-    return res.status(400).json({
-      status: 400,
-      message: INVALID_TOKEN,
-    });
+    return res.sendStatus(403);
   }
 };
 

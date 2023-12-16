@@ -10,7 +10,7 @@ export const userService = {
   },
   getOne: (credentials) => {
     try {
-      return User.findOne({ ...credentials }).populate("profile");
+      return User.findOne({ ...credentials });
     } catch (error) {
       return error;
     }
@@ -23,7 +23,6 @@ export const userService = {
       anUser.username = newUser.username;
       anUser.password = newUser.password;
       anUser.email = newUser.email;
-      anUser.profile = newUser.profile;
 
       return await anUser.save();
     } catch (error) {
