@@ -1,6 +1,8 @@
+import allowedOrigins from "../config/allowedOrigins.js";
+
 const credentials = (req, res, next) => {
   const origin = req.headers.origin;
-  if (["http://localhost:5173"].includes(origin)) {
+  if (allowedOrigins.includes(origin)) {
     res.header("Access-Control-Allow-Credentials", true);
     next();
   }
