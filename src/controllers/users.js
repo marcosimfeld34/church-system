@@ -133,7 +133,7 @@ const usersController = {
             id: decoded.id,
           },
           process.env.ACCESS_TOKEN_SECRET,
-          { expiresIn: "10s" }
+          { expiresIn: "15m" }
         );
         return res.json({ accessToken });
       }
