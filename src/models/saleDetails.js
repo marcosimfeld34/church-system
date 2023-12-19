@@ -24,10 +24,37 @@ const saleDetailSchema = new Schema({
   createdAt: {
     type: Date,
     inmutable: true,
-    default: () => new Date(),
+    default: () => {
+      let now = new Date().toLocaleString("es-MX", {
+        timeZone: "America/Argentina/Buenos_Aires",
+      });
+      let dateWithoutTime = now.split(",")[0];
+
+      let day = dateWithoutTime.split("/")[0];
+      let month = dateWithoutTime.split("/")[1];
+      let year = dateWithoutTime.split("/")[2];
+
+      return new Date(`${month}/${day}/${year}`);
+    },
   },
   updatedAt: {
     type: Date,
+    default: () => {
+      let now = new Date().toLocaleString("es-MX", {
+        timeZone: "America/Argentina/Buenos_Aires",
+      });
+      let dateWithoutTime = now.split(",")[0];
+
+      let day = dateWithoutTime.split("/")[0];
+      let month = dateWithoutTime.split("/")[1];
+      let year = dateWithoutTime.split("/")[2];
+
+      return new Date(`${month}/${day}/${year}`);
+    },
+  },
+  sortingDate: {
+    type: Date,
+    inmutable: true,
     default: () => new Date(),
   },
   deletedAt: {

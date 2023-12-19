@@ -4,16 +4,24 @@ import { MISSING_FIELDS_REQUIRED, NOT_FOUND } from "../labels/labels.js";
 const salesController = {
   getAll: async (req, res) => {
     // const createdBy = req.user.id;
+    let startDate = new Date();
+    let endDate = new Date();
 
-    let today = new Date();
+    if (req.query.startDate) {
+      startDate = new Date(req.query.startDate);
+    }
+    if (req.query.endDate) {
+      endDate = new Date(req.query.endDate);
+    }
+
+    endDate.setDate(endDate.getDate() + 1);
 
     const filters = {
       $expr: {
         $and: [
           { $eq: ["$isDeleted", false] },
-          { $eq: [{ $dayOfMonth: "$createdAt" }, today.getDate()] },
-          { $eq: [{ $month: "$createdAt" }, today.getMonth() + 1] },
-          { $eq: [{ $year: "$createdAt" }, today.getFullYear()] },
+          { $gte: ["$createdAt", startDate] },
+          { $lte: ["$createdAt", endDate] },
         ],
       },
     };
@@ -23,29 +31,6 @@ const salesController = {
     return res.status(200).json({
       status: 200,
       total: sales.length,
-      data: sales,
-    });
-  },
-  getTotalSale: async (req, res) => {
-    // const createdBy = req.user.id;
-
-    let today = new Date();
-
-    const filters = {
-      $expr: {
-        $and: [
-          { $eq: ["$isDeleted", false] },
-          { $eq: [{ $dayOfMonth: "$createdAt" }, today.getDate()] },
-          { $eq: [{ $month: "$createdAt" }, today.getMonth() + 1] },
-          { $eq: [{ $year: "$createdAt" }, today.getFullYear()] },
-        ],
-      },
-    };
-
-    const sales = await salesService.getTotalByDate(filters);
-
-    return res.status(200).json({
-      status: 200,
       data: sales,
     });
   },

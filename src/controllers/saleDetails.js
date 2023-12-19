@@ -5,15 +5,24 @@ const saleDetailsController = {
   getAll: async (req, res) => {
     // const createdBy = req.user.id;
 
-    let today = new Date();
+    let startDate = new Date();
+    let endDate = new Date();
 
-    let filters = {
+    if (req.query.startDate) {
+      startDate = new Date(req.query.startDate);
+    }
+    if (req.query.endDate) {
+      endDate = new Date(req.query.endDate);
+    }
+
+    endDate.setDate(endDate.getDate() + 1);
+
+    const filters = {
       $expr: {
         $and: [
           { $eq: ["$isDeleted", false] },
-          { $eq: [{ $dayOfMonth: "$createdAt" }, today.getDate()] },
-          { $eq: [{ $month: "$createdAt" }, today.getMonth() + 1] },
-          { $eq: [{ $year: "$createdAt" }, today.getFullYear()] },
+          { $gte: ["$createdAt", startDate] },
+          { $lte: ["$createdAt", endDate] },
         ],
       },
     };
