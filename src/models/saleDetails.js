@@ -34,7 +34,11 @@ const saleDetailSchema = new Schema({
       let month = dateWithoutTime.split("/")[1];
       let year = dateWithoutTime.split("/")[2];
 
-      return new Date(`${month}/${day}/${year}`);
+      let dateToSave = new Date(`${month}/${day}/${year}`);
+
+      dateToSave.setHours(12, 0, 0, 0);
+
+      return dateToSave;
     },
   },
   updatedAt: {
@@ -49,7 +53,11 @@ const saleDetailSchema = new Schema({
       let month = dateWithoutTime.split("/")[1];
       let year = dateWithoutTime.split("/")[2];
 
-      return new Date(`${month}/${day}/${year}`);
+      let dateToSave = new Date(`${month}/${day}/${year}`);
+
+      dateToSave.setHours(12, 0, 0, 0);
+
+      return dateToSave;
     },
   },
   sortingDate: {
