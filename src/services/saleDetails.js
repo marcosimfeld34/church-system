@@ -4,7 +4,7 @@ export const saleDetailsService = {
   getAll: (options) => {
     try {
       return SaleDetail.find({ ...options })
-        .populate("product", ["name", "costPrice", "stock"])
+        .populate("product", ["name", "costPrice", "stock", "category"])
         .populate("createdBy", ["firstName", "lastName"])
         .sort({ sortingDate: -1 });
     } catch (error) {
