@@ -74,7 +74,7 @@ const salesController = {
     });
   },
   store: async (req, res) => {
-    if (!req.body.client || !req.body.total) {
+    if (!req.body.client || !req.body.methodPayment || !req.body.total) {
       return res.status(400).json({
         status: 400,
         isStored: false,
@@ -114,7 +114,7 @@ const salesController = {
     });
   },
   update: async (req, res) => {
-    if (!req.body.client || !req.body.total) {
+    if (!req.body.client || !req.body.methodPayment || !req.body.total) {
       return res.status(400).json({
         status: 400,
         isStored: false,

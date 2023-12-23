@@ -6,6 +6,7 @@ export const salesService = {
       return Sale.find({ ...options })
         .populate("createdBy", ["firstName", "lastName"])
         .populate("client", "name")
+        .populate("methodPayment", "name")
         .sort({ sortingDate: -1 });
     } catch (error) {
       return error;
@@ -53,6 +54,7 @@ export const salesService = {
     try {
       const sale = await Sale.findOne({ _id: id });
       sale.client = newSaleData?.client;
+      sale.methodPayment = newSaleData?.methodPayment;
       sale.isPaid = newSaleData?.isPaid;
       sale.total = newSaleData?.total;
 

@@ -8,6 +8,11 @@ const saleSchema = new Schema({
     ref: "client",
     required: true,
   },
+  methodPayment: {
+    type: SchemaTypes.ObjectId,
+    ref: "methodPayment",
+    required: true,
+  },
   isPaid: {
     type: Boolean,
     required: true,

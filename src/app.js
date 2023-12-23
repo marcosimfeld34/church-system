@@ -17,6 +17,7 @@ import categoriesRouter from "./routes/categories.js";
 import clientsRouter from "./routes/clients.js";
 import saleDetailsRouter from "./routes/saleDetails.js";
 import debtsRouter from "./routes/debts.js";
+import methodPaymentRouter from "./routes/methodPayments.js";
 
 // middlewares
 import credentials from "./middlewares/credentials.js";
@@ -56,6 +57,7 @@ app.use("/api/v1/categories", categoriesRouter);
 app.use("/api/v1/clients", clientsRouter);
 app.use("/api/v1/saleDetails", saleDetailsRouter);
 app.use("/api/v1/debts", debtsRouter);
+app.use("/api/v1/methodPayments", methodPaymentRouter);
 
 // app server listening
 const PORT = process.env.PORT || 3001;
