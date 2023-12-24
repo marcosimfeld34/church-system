@@ -5,7 +5,7 @@ export const debtService = {
     try {
       return Debt.find({ ...options })
         .populate("client", "name")
-        .populate("sale", ["isPaid", "client", "total"])
+        .populate("sale", ["isPaid", "client", "total", "methodPayment"])
         .sort({ createdAt: -1 });
     } catch (error) {
       return error;
