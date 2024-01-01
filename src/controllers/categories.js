@@ -5,11 +5,16 @@ const categoriesController = {
   getAll: async (req, res) => {
     // const createdBy = req.user.id;
 
-    const categories = await categoriesService.getAll({
+    const { id } = req.query;
+
+    const filters = {
       $expr: {
         $and: [{ $eq: ["$isDeleted", false] }],
+        $and: [{ $eq: ["$_id", id] }],
       },
-    });
+    };
+
+    const categories = await categoriesService.getAll(id ? filters : {});
 
     return res.status(200).json({
       status: 200,

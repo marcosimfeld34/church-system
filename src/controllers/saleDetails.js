@@ -4,6 +4,9 @@ import { MISSING_FIELDS_REQUIRED, NOT_FOUND } from "../labels/labels.js";
 const saleDetailsController = {
   getAll: async (req, res) => {
     // const createdBy = req.user.id;
+
+    const { id } = req.query;
+
     const all = req.query.all === "true" ? true : false;
 
     let startDate = new Date();
@@ -28,7 +31,18 @@ const saleDetailsController = {
       },
     };
 
-    const saleDetails = await saleDetailsService.getAll(!all ? filters : {});
+    const saleDetails = await saleDetailsService.getAll(
+      !id
+        ? !all
+          ? filters
+          : {}
+        : {
+            $expr: {
+              $and: [{ $eq: ["$isDeleted", false] }],
+              $and: [{ $eq: ["$_id", id] }],
+            },
+          }
+    );
 
     return res.status(200).json({
       status: 200,

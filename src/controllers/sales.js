@@ -5,6 +5,8 @@ const salesController = {
   getAll: async (req, res) => {
     // const createdBy = req.user.id;
 
+    const { id } = req.query;
+
     const all = req.query.all === "true" ? true : false;
 
     let startDate = new Date();
@@ -29,7 +31,18 @@ const salesController = {
       },
     };
 
-    const sales = await salesService.getAll(!all ? filters : {});
+    const sales = await salesService.getAll(
+      !id
+        ? !all
+          ? filters
+          : {}
+        : {
+            $expr: {
+              $and: [{ $eq: ["$isDeleted", false] }],
+              $and: [{ $eq: ["$_id", id] }],
+            },
+          }
+    );
 
     return res.status(200).json({
       status: 200,

@@ -5,11 +5,16 @@ const methodPaymentController = {
   getAll: async (req, res) => {
     // const createdBy = req.user.id;
 
-    const methodPayments = await methodPaymentService.getAll({
+    const { id } = req.query;
+
+    const filters = {
       $expr: {
         $and: [{ $eq: ["$isDeleted", false] }],
+        $and: [{ $eq: ["$_id", id] }],
       },
-    });
+    };
+
+    const methodPayments = await methodPaymentService.getAll(id ? filters : {});
 
     return res.status(200).json({
       status: 200,

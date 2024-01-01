@@ -5,11 +5,26 @@ const debtsController = {
   getAll: async (req, res) => {
     // const createdBy = req.user.id;
 
-    const debts = await debtService.getAll({
+    const { id } = req.query;
+
+    const filters = {
       $expr: {
-        $and: [{ $eq: ["$isDeleted", false] }, { $eq: ["$isPaid", false] }],
+        $and: [{ $eq: ["$isDeleted", false] }],
+        $and: [{ $eq: ["$isPaid", false] }],
+        $and: [{ $eq: ["$_id", id] }],
       },
-    });
+    };
+
+    const debts = await debtService.getAll(
+      id
+        ? filters
+        : {
+            $expr: {
+              $and: [{ $eq: ["$isDeleted", false] }],
+              // $and: [{ $eq: ["$isPaid", false] }],
+            },
+          }
+    );
 
     return res.status(200).json({
       status: 200,
