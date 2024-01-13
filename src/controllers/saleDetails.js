@@ -9,6 +9,8 @@ const saleDetailsController = {
 
     const all = req.query.all === "true" ? true : false;
 
+    const historyMonthToRetrieve = req.query.historyMonthToRetrieve;
+
     let startDate = new Date();
     let endDate = new Date();
 
@@ -20,6 +22,16 @@ const saleDetailsController = {
     }
 
     endDate.setDate(endDate.getDate() + 1);
+
+    if (historyMonthToRetrieve) {
+      startDate = new Date();
+      startDate.setDate(0);
+      startDate.setMonth(startDate.getMonth() + 1);
+      startDate.setFullYear(startDate.getFullYear() - 1);
+
+      endDate = new Date();
+      endDate.setDate(endDate.getDate() + 1);
+    }
 
     const filters = {
       $expr: {

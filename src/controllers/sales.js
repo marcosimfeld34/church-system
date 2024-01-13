@@ -9,17 +9,30 @@ const salesController = {
 
     const all = req.query.all === "true" ? true : false;
 
+    const historyMonthToRetrieve = req.query.historyMonthToRetrieve;
+
     let startDate = new Date();
     let endDate = new Date();
 
     if (req.query.startDate) {
       startDate = new Date(req.query.startDate);
     }
+
     if (req.query.endDate) {
       endDate = new Date(req.query.endDate);
     }
 
     endDate.setDate(endDate.getDate() + 1);
+
+    if (historyMonthToRetrieve) {
+      startDate = new Date();
+      startDate.setDate(0);
+      startDate.setMonth(startDate.getMonth() + 1);
+      startDate.setFullYear(startDate.getFullYear() - 1);
+
+      endDate = new Date();
+      endDate.setDate(endDate.getDate() + 1);
+    }
 
     const filters = {
       $expr: {
