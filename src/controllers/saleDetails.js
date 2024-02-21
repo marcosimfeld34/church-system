@@ -11,6 +11,8 @@ const saleDetailsController = {
 
     const historyMonthToRetrieve = req.query.historyMonthToRetrieve;
 
+    const saleId = req.query.saleId;
+
     let startDate = new Date();
     let endDate = new Date();
 
@@ -33,13 +35,18 @@ const saleDetailsController = {
       endDate.setDate(endDate.getDate() + 1);
     }
 
+    const conditions = [{ $eq: ["$isDeleted", false] }];
+
+    if (saleId) {
+      conditions.push({ $eq: ["$sale", saleId] });
+    } else {
+      conditions.push({ $gte: ["$createdAt", startDate] });
+      conditions.push({ $lte: ["$createdAt", endDate] });
+    }
+
     const filters = {
       $expr: {
-        $and: [
-          { $eq: ["$isDeleted", false] },
-          { $gte: ["$createdAt", startDate] },
-          { $lte: ["$createdAt", endDate] },
-        ],
+        $and: conditions,
       },
     };
 
